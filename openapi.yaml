@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.3
+  version: 0.0.4
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
@@ -14,8 +14,8 @@ paths:
   /api/v1/roster:
     post:
       operationId: submitRoster
-      summary: Submit a new roster solve request
-      description: Submit a new roster solve request to the backend.
+      summary: Create a new roster
+      description: Create a new roster with an initial revision.
       requestBody:
         required: true
         content:
@@ -24,7 +24,7 @@ paths:
               $ref: "#/components/schemas/RosterSubmission"
       responses:
         "201":
-          description: Roster solve request created successfully
+          description: Roster created successfully
           content:
             application/json:
               schema:
@@ -41,10 +41,9 @@ paths:
           description: Forbidden
   /api/v1/roster/{id}:
     get:
-      tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRoster
-      summary: Get roster solve status and results
-      description: Retrieve the status and results of a submitted roster solve by its ID.
+      summary: Get roster details
+      description: Retrieve a roster by its ID.
       parameters:
         - name: id
           in: path
@@ -52,10 +51,10 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
       responses:
         "200":
-          description: Roster solve found
+          description: Roster found
           content:
             application/json:
               schema:
@@ -67,7 +66,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
-          description: Roster solve not found
+          description: Roster not found
           content:
             application/json:
               schema:
@@ -78,8 +77,8 @@ paths:
           description: Forbidden
     put:
       operationId: updateRoster
-      summary: Update a roster configuration
-      description: Update the parameters of a roster configuration by its ID.
+      summary: Update a roster
+      description: Update the name of a roster by its ID.
       parameters:
         - name: id
           in: path
@@ -87,7 +86,7 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
       requestBody:
         required: true
         content:
@@ -113,10 +112,11 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-    patch:
-      operationId: patchRoster
-      summary: Partially update a roster configuration
-      description: Partially update a roster configuration by its ID. Only the fields provided in the request body will be updated.
+  /api/v1/roster/{id}/revision:
+    post:
+      operationId: submitRosterRevision
+      summary: Create a new roster revision
+      description: Create a new revision for a roster with the provided parameters.
       parameters:
         - name: id
           in: path
@@ -124,16 +124,20 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RosterParameters"
+              $ref: "#/components/schemas/RosterRevisionSubmission"
       responses:
-        "200":
-          description: Roster updated successfully
+        "201":
+          description: Roster revision created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterRevisionCreatedResponse"
         "400":
           description: Invalid request
           content:
@@ -142,6 +146,175 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Roster not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    get:
+      operationId: listRosterRevisions
+      summary: List roster revisions
+      description: Retrieve all revisions for a given roster ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the roster.
+      responses:
+        "200":
+          description: List of revisions for the roster
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RosterRevisionListItemResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /api/v1/roster/{id}/revision/{revisionNumber}:
+    get:
+      tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
+      operationId: getRosterRevision
+      summary: Get roster revision details
+      description: Retrieve a specific revision of a roster by roster ID and revision number.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
+      responses:
+        "200":
+          description: Roster revision found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterRevisionResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster or revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    put:
+      operationId: updateRosterRevision
+      summary: Update a roster revision
+      description: Update the parameters of a roster revision by roster ID and revision number.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RosterRevisionSubmission"
+      responses:
+        "200":
+          description: Roster revision updated successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster or revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    patch:
+      operationId: patchRosterRevision
+      summary: Partially update a roster revision
+      description: Partially update a roster revision by roster ID and revision number. Only the fields provided in the request body will be updated.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RosterParameters"
+      responses:
+        "200":
+          description: Roster revision updated successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster or revision not found
           content:
             application/json:
               schema:
@@ -215,11 +388,11 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/solve:
+  /api/v1/roster/{id}/revision/{revisionNumber}/solve:
     post:
-      operationId: solveRoster
-      summary: Trigger solving a roster instance
-      description: Start the solve process for a specific roster configuration by its ID.
+      operationId: solveRosterRevision
+      summary: Trigger solving a roster revision
+      description: Start the solve process for a specific roster revision by roster ID and revision number.
       parameters:
         - name: id
           in: path
@@ -227,7 +400,14 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
       responses:
         "202":
           description: Solve process started
@@ -238,7 +418,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
-          description: Roster not found
+          description: Roster or revision not found
           content:
             application/json:
               schema:
@@ -247,11 +427,11 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/solutions:
+  /api/v1/roster/{id}/revision/{revisionNumber}/solutions:
     get:
       operationId: listSolutions
-      summary: List solutions for a roster
-      description: Retrieve all solutions associated with a given roster ID.
+      summary: List solutions for a roster revision
+      description: Retrieve all solutions associated with a given roster revision.
       parameters:
         - name: id
           in: path
@@ -259,10 +439,17 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
       responses:
         "200":
-          description: List of solutions for the specified roster
+          description: List of solutions for the specified roster revision
           content:
             application/json:
               schema:
@@ -276,7 +463,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
-          description: Roster not found
+          description: Roster or revision not found
           content:
             application/json:
               schema:
@@ -322,15 +509,18 @@ components:
   schemas:
     RosterSubmission:
       type: object
-      required:
-        - parameters
       properties:
         name:
           type: string
           description: The name of the roster.
+    RosterRevisionSubmission:
+      type: object
+      required:
+        - parameters
+      properties:
         parameters:
           $ref: "#/components/schemas/RosterParameters"
-          description: The parameters for the roster scheduling.
+          description: The parameters for the roster revision.
     RosterParameters:
       type: object
       # Note that no fields are required here as the client can send a work-in-progress
@@ -507,28 +697,79 @@ components:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the created roster configuration.
+          description: Unique identifier for the created roster.
+        revision_number:
+          type: integer
+          format: int32
+          description: Revision number of the initial revision if parameters were provided.
     RosterResponse:
       type: object
       required:
         - id
         - name
-        - parameters
         - createdAt
       properties:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the roster configuration.
+          description: Unique identifier for the roster.
         name:
           type: string
           description: The name of the roster.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the roster was created.
+    RosterRevisionCreatedResponse:
+      type: object
+      required:
+        - revision_number
+      properties:
+        revision_number:
+          type: integer
+          format: int32
+          description: Revision number for the created roster revision.
+    RosterRevisionResponse:
+      type: object
+      required:
+        - roster_id
+        - revision_number
+        - parameters
+        - createdAt
+      properties:
+        roster_id:
+          type: integer
+          format: int32
+          description: Unique identifier for the roster.
+        revision_number:
+          type: integer
+          format: int32
+          description: Revision number of this revision.
         parameters:
           $ref: "#/components/schemas/RosterParameters"
         createdAt:
           type: string
           format: date-time
-          description: Timestamp when the roster solve was created.
+          description: Timestamp when the roster revision was created.
+    RosterRevisionListItemResponse:
+      type: object
+      required:
+        - roster_id
+        - revision_number
+        - createdAt
+      properties:
+        roster_id:
+          type: integer
+          format: int32
+          description: Unique identifier for the roster.
+        revision_number:
+          type: integer
+          format: int32
+          description: Revision number of this revision.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the roster revision was created.
     ErrorResponse:
       type: object
       required:
@@ -559,6 +800,7 @@ components:
       type: object
       required:
         - roster_id
+        - revision_number
         - solution
         - status
       properties:
@@ -566,6 +808,10 @@ components:
           type: integer
           format: int32
           description: The ID of the roster this solution is for.
+        revision_number:
+          type: integer
+          format: int32
+          description: The revision number of the roster revision this solution is for.
         solution:
           type: array
           items:
@@ -589,6 +835,7 @@ components:
       required:
         - id
         - roster_id
+        - revision_number
         - solution
         - status
         - createdAt
@@ -601,6 +848,10 @@ components:
           type: integer
           format: int32
           description: The ID of the roster this solution is for.
+        revision_number:
+          type: integer
+          format: int32
+          description: The revision number of the roster revision this solution is for.
         solution:
           type: array
           items:
@@ -619,6 +870,7 @@ components:
       required:
         - id
         - roster_id
+        - revision_number
         - status
         - createdAt
       properties:
@@ -630,6 +882,10 @@ components:
           type: integer
           format: int32
           description: The ID of the roster this solution is for.
+        revision_number:
+          type: integer
+          format: int32
+          description: The revision number of the roster revision this solution is for.
         status:
           $ref: "#/components/schemas/SolutionStatus"
         createdAt:
