@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.4
+  version: 0.0.5
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
@@ -12,6 +12,23 @@ security:
   - BearerAuth: []
 paths:
   /api/v1/roster:
+    get:
+      operationId: listRosters
+      summary: List all rosters
+      description: Retrieve a list of all rosters.
+      responses:
+        "200":
+          description: List of rosters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RosterResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
     post:
       operationId: submitRoster
       summary: Create a new roster
