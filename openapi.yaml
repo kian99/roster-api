@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.6
+  version: 0.0.8
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
@@ -12,13 +12,6 @@ security:
   - BearerAuth: []
 paths:
   /api/v1/roster:
-    options:
-      operationId: optionsRoster
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      responses:
-        "204":
-          description: No Content
     get:
       operationId: listRosters
       summary: List all rosters
@@ -64,21 +57,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/roster/{id}:
-    options:
-      operationId: optionsRosterDetail
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the roster.
-      responses:
-        "204":
-          description: No Content
     get:
       operationId: getRoster
       summary: Get roster details
@@ -152,21 +130,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/roster/{id}/revision:
-    options:
-      operationId: optionsRosterRevision
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the roster.
-      responses:
-        "204":
-          description: No Content
     post:
       operationId: submitRosterRevision
       summary: Create a new roster revision
@@ -246,28 +209,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/roster/{id}/revision/{revisionNumber}:
-    options:
-      operationId: optionsRosterRevisionDetail
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the roster.
-        - name: revisionNumber
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster revision.
-      responses:
-        "204":
-          description: No Content
     get:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRosterRevision
@@ -400,13 +341,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/solution:
-    options:
-      operationId: optionsSolution
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      responses:
-        "204":
-          description: No Content
     post:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: submitSolution
@@ -436,21 +370,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/solution/{id}:
-    options:
-      operationId: optionsSolutionDetail
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the solution.
-      responses:
-        "204":
-          description: No Content
     get:
       operationId: getSolution
       summary: Get a solution by ID
@@ -487,28 +406,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/roster/{id}/revision/{revisionNumber}/solve:
-    options:
-      operationId: optionsSolveRosterRevision
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the roster.
-        - name: revisionNumber
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster revision.
-      responses:
-        "204":
-          description: No Content
     post:
       operationId: solveRosterRevision
       summary: Trigger solving a roster revision
@@ -548,28 +445,6 @@ paths:
         "403":
           description: Forbidden
   /api/v1/roster/{id}/revision/{revisionNumber}/solutions:
-    options:
-      operationId: optionsListSolutions
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the roster.
-        - name: revisionNumber
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster revision.
-      responses:
-        "204":
-          description: No Content
     get:
       operationId: listSolutions
       summary: List solutions for a roster revision
@@ -615,13 +490,6 @@ paths:
         "403":
           description: Forbidden
   /healthz:
-    options:
-      operationId: optionsHealthCheck
-      summary: CORS support
-      description: Enable CORS by returning correct headers
-      responses:
-        "204":
-          description: No Content
     get:
       operationId: healthCheck
       summary: Health check
