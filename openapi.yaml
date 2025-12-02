@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.8
+  version: 0.0.9
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
@@ -189,9 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RosterRevisionListItemResponse"
+                $ref: "#/components/schemas/RosterRevisionsListResponse"
         "400":
           description: Invalid request
           content:
@@ -779,6 +777,38 @@ components:
           type: integer
           format: int32
           description: Unique identifier for the roster.
+        revision_number:
+          type: integer
+          format: int32
+          description: Revision number of this revision.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the roster revision was created.
+    RosterRevisionsListResponse:
+      type: object
+      required:
+        - roster_id
+        - roster_name
+        - revisions
+      properties:
+        roster_id:
+          type: integer
+          format: int32
+          description: Unique identifier for the roster.
+        roster_name:
+          type: string
+          description: The name of the roster.
+        revisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RosterRevisionSummary"
+    RosterRevisionSummary:
+      type: object
+      required:
+        - revision_number
+        - createdAt
+      properties:
         revision_number:
           type: integer
           format: int32
