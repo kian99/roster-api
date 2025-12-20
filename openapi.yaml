@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.9
+  version: 0.0.11
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
