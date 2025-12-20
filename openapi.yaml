@@ -541,11 +541,11 @@ components:
       # Note that no fields are required here as the client can send a work-in-progress
       # roster that will only be partially filled out.
       properties:
-        doctors:
+        people:
           type: array
           items:
-            type: string
-          description: The names of all doctors.
+            $ref: "#/components/schemas/Person"
+          description: All people in the roster.
         num_days:
           type: integer
           minimum: 1
@@ -554,30 +554,30 @@ components:
           type: string
           format: date
           description: The start date of the schedule.
-        doctors_per_shift_override:
+        people_per_shift_override:
           type: object
-          description: Mapping from day index (as string) to a map of shift name to number of doctors required for each shift.
+          description: Mapping from day index (as string) to a map of shift ID to number of people required for each shift.
           additionalProperties:
             type: object
             additionalProperties:
               type: integer
-              description: Number of doctors required for the shift.
-        doctors_per_shift_default:
+              description: Number of people required for the shift.
+        people_per_shift_default:
           type: object
-          description: Default number of doctors for each shift if not specified for a day.
+          description: Default number of people for each shift if not specified for a day.
           additionalProperties:
             type: integer
         shifts:
           type: array
           items:
-            type: string
-          description: The names of the shifts in a day.
+            $ref: "#/components/schemas/Shift"
+          description: The shifts in a day.
         balance_overtime:
           type: boolean
-          description: Whether to balance overtime hours across doctors.
+          description: Whether to balance overtime hours across people.
         unavailable_slots:
           type: object
-          description: Mapping of shift name to doctor name to list of days the doctor is unavailable.
+          description: Mapping of shift ID to person ID to list of days the person is unavailable.
           additionalProperties:
             type: object
             additionalProperties:
@@ -586,24 +586,24 @@ components:
                 type: integer
         leave_days:
           type: object
-          description: Mapping of doctor name to days the doctor is on leave.
+          description: Mapping of person ID to days the person is on leave.
           additionalProperties:
             type: array
             items:
               type: integer
         known_assignments:
           type: object
-          description: Mapping of doctor name to a map of shift name to list of days the doctor is assigned to that shift.
+          description: Mapping of person ID to a map of shift ID to list of days the person is assigned to that shift.
           additionalProperties:
             type: object
             additionalProperties:
               type: array
               items:
                 type: integer
-              description: List of days the doctor is assigned to the shift.
+              description: List of days the person is assigned to the shift.
         shift_hours:
           type: object
-          description: Mapping from shift name (e.g. 'day', 'night') to a dict of days of the week/default ('monday', 'tuesday') to a dict of regular/overtime hours.
+          description: Mapping from shift ID to a dict of days of the week/default ('monday', 'tuesday') to a dict of regular/overtime hours.
           additionalProperties:
             type: object
             additionalProperties:
@@ -620,7 +620,7 @@ components:
             type: integer
         override_shift_hours:
           type: object
-          description: Mapping from day of the month index to shift name (e.g. 'day', 'night') to a dict or regular/overtime hours.
+          description: Mapping from day of the month index to shift ID to a dict of regular/overtime hours.
           additionalProperties:
             type: object
             additionalProperties:
@@ -632,15 +632,15 @@ components:
         minimum_days_post_shift:
           type: integer
           minimum: 1
-          description: The minimum number of days a doctor must have off after doing a shift.
+          description: The minimum number of days a person must have off after doing a shift.
         minimum_golden_weekends:
           type: integer
           minimum: 0
-          description: Minimum number of golden weekends (weekends with no shifts) a doctor should have.
+          description: Minimum number of golden weekends (weekends with no shifts) a person should have.
         maximum_golden_weekends:
           type: integer
           minimum: 0
-          description: Maximum number of golden weekends (weekends with no shifts) a doctor can have. If 0, no maximum is enforced.
+          description: Maximum number of golden weekends (weekends with no shifts) a person can have. If 0, no maximum is enforced.
         balance_day_night:
           type: boolean
           description: Whether to balance day and night shifts.
@@ -649,20 +649,20 @@ components:
           description: Whether to balance weekend shifts.
         post_call:
           type: object
-          description: Mapping of shift names to whether they provide post-call (i.e. getting the next day off).
+          description: Mapping of shift IDs to whether they provide post-call (i.e. getting the next day off).
           additionalProperties:
             type: boolean
         minimum_overtime_hours:
           type: integer
           minimum: 0
-          description: Minimum overtime hours a doctor should work.
+          description: Minimum overtime hours a person should work.
         minimum_regular_hours:
           type: integer
           minimum: 0
-          description: Minimum regular hours a doctor should work.
+          description: Minimum regular hours a person should work.
         groups:
           type: object
-          description: Mapping of group name to list of doctor names in that group. Used to prevent group members from working the same day.
+          description: Mapping of group name to list of person IDs in that group. Used to prevent group members from working the same day.
           additionalProperties:
             type: array
             items:
@@ -674,21 +674,21 @@ components:
           description: List of days names for which to restrict group overlap.
         groups_unavailable_slots:
           type: object
-          description: Mapping of group name to a dict with keys of shift names, indicating unavailable slots for the group.
+          description: Mapping of group name to a dict with keys of shift IDs, indicating unavailable slots for the group.
           additionalProperties:
             type: object
             additionalProperties:
               type: array
               items:
                 type: integer
-        minimum_shifts_per_doctor:
+        minimum_shifts_per_person:
           type: object
-          description: Mapping of doctor name to minimum number of shifts that doctor should work. If not specified, defaults to 0.
+          description: Mapping of person ID to minimum number of shifts that person should work. If not specified, defaults to 0.
           additionalProperties:
             type: integer
-        maximum_shifts_per_doctor:
+        maximum_shifts_per_person:
           type: object
-          description: Mapping of doctor name to maximum number of shifts that doctor can work. If not specified, there is no maximum.
+          description: Mapping of person ID to maximum number of shifts that person can work. If not specified, there is no maximum.
           additionalProperties:
             type: integer
         groups_allowed_days:
@@ -700,7 +700,7 @@ components:
               type: integer
         maximum_shifts:
           type: integer
-          description: Maximum number of shifts that can be assigned to any doctor.
+          description: Maximum number of shifts that can be assigned to any person.
         golden_weekends_ignore_leave:
           type: boolean
           description: Whether to ignore leave days when calculating golden weekends.
@@ -835,6 +835,30 @@ components:
           type: integer
         overtime:
           type: integer
+    Person:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the person.
+        name:
+          type: string
+          description: The name of the person.
+    Shift:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the shift.
+        name:
+          type: string
+          description: The name of the shift.
     SolutionStatus:
       type: string
       description: The status of the solution.
