@@ -661,8 +661,13 @@ components:
           minimum: 0
           description: Minimum regular hours a person should work.
         groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/Group"
+          description: All groups in the roster.
+        group_members:
           type: object
-          description: Mapping of group name to list of person IDs in that group. Used to prevent group members from working the same day.
+          description: Mapping of group ID to list of person IDs in that group. Used to prevent group members from working the same day.
           additionalProperties:
             type: array
             items:
@@ -674,7 +679,7 @@ components:
           description: List of days names for which to restrict group overlap.
         groups_unavailable_slots:
           type: object
-          description: Mapping of group name to a dict with keys of shift IDs, indicating unavailable slots for the group.
+          description: Mapping of group ID to a dict with keys of shift IDs, indicating unavailable slots for the group.
           additionalProperties:
             type: object
             additionalProperties:
@@ -693,7 +698,7 @@ components:
             type: integer
         groups_allowed_days:
           type: object
-          description: Mapping of group name to list of days that group is allowed to work.
+          description: Mapping of group ID to list of days that group is allowed to work.
           additionalProperties:
             type: array
             items:
@@ -859,6 +864,18 @@ components:
         name:
           type: string
           description: The name of the shift.
+    Group:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the group.
+        name:
+          type: string
+          description: The name of the group.
     SolutionStatus:
       type: string
       description: The status of the solution.
