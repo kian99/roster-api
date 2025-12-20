@@ -620,7 +620,7 @@ components:
             type: integer
         override_shift_hours:
           type: object
-          description: Mapping from day of the month index to shift ID to a dict or regular/overtime hours.
+          description: Mapping from day of the month index to shift ID to a dict of regular/overtime hours.
           additionalProperties:
             type: object
             additionalProperties:
