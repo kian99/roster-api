@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.11
+  version: 0.0.12
   description: API for submitting and managing roster scheduling jobs.
 servers:
   - url: http://localhost:8080
@@ -524,6 +524,8 @@ components:
   schemas:
     RosterSubmission:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
@@ -713,6 +715,7 @@ components:
       type: object
       required:
         - id
+        - revision_number
       properties:
         id:
           type: integer
@@ -721,7 +724,7 @@ components:
         revision_number:
           type: integer
           format: int32
-          description: Revision number of the initial revision if parameters were provided.
+          description: Revision number of the initial revision.
     RosterResponse:
       type: object
       required:
@@ -767,25 +770,6 @@ components:
           description: Revision number of this revision.
         parameters:
           $ref: "#/components/schemas/RosterParameters"
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the roster revision was created.
-    RosterRevisionListItemResponse:
-      type: object
-      required:
-        - roster_id
-        - revision_number
-        - createdAt
-      properties:
-        roster_id:
-          type: integer
-          format: int32
-          description: Unique identifier for the roster.
-        revision_number:
-          type: integer
-          format: int32
-          description: Revision number of this revision.
         createdAt:
           type: string
           format: date-time
