@@ -24,7 +24,7 @@ paths:
             type: string
             enum: [created_date, name]
             default: created_date
-          description: Field to sort by.
+          description: Field to sort by. Options are 'created_date' (roster creation timestamp) or 'name' (roster display name).
         - name: sortOrder
           in: query
           required: false
@@ -32,7 +32,7 @@ paths:
             type: string
             enum: [asc, desc]
             default: desc
-          description: Sort order.
+          description: Sort order. Use 'asc' for ascending or 'desc' for descending.
         - name: name
           in: query
           required: false
@@ -230,7 +230,7 @@ paths:
             type: string
             enum: [created_date]
             default: created_date
-          description: Field to sort by.
+          description: Field to sort by. Currently only 'created_date' (revision creation timestamp) is supported.
         - name: sortOrder
           in: query
           required: false
@@ -238,7 +238,7 @@ paths:
             type: string
             enum: [asc, desc]
             default: desc
-          description: Sort order.
+          description: Sort order. Use 'asc' for ascending or 'desc' for descending.
         - name: limit
           in: query
           required: false
