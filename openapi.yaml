@@ -6,10 +6,6 @@ info:
   title: Roster Scheduler Backend API
   version: 0.0.13
   description: API for submitting and managing roster scheduling jobs.
-servers:
-  - url: http://localhost:8080
-security:
-  - BearerAuth: []
 paths:
   /api/v1/roster:
     get:

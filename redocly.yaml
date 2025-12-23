@@ -1,0 +1,6 @@
+extends:
+  - recommended
+rules:
+  # Turns off a specific rule
+  security-defined: off
+  no-empty-servers: off
