@@ -810,6 +810,20 @@ components:
           type: string
           format: date-time
           description: Timestamp when the roster was created.
+    Metadata:
+      type: object
+      required:
+        - total_count
+        - page_total
+      properties:
+        total_count:
+          type: integer
+          format: int32
+          description: Total number of items matching the query.
+        page_total:
+          type: integer
+          format: int32
+          description: Total number of pages available for the given page size.
     RosterListResponse:
       type: object
       required:
@@ -817,19 +831,7 @@ components:
         - rosters
       properties:
         metadata:
-          type: object
-          required:
-            - total_count
-            - page_total
-          properties:
-            total_count:
-              type: integer
-              format: int32
-              description: Total number of rosters matching the query.
-            page_total:
-              type: integer
-              format: int32
-              description: Total number of pages available for the given page size.
+          $ref: "#/components/schemas/Metadata"
         rosters:
           type: array
           items:
@@ -885,19 +887,7 @@ components:
           items:
             $ref: "#/components/schemas/RosterRevisionSummary"
         metadata:
-          type: object
-          required:
-            - total_count
-            - page_total
-          properties:
-            total_count:
-              type: integer
-              format: int32
-              description: Total number of revisions available for this roster.
-            page_total:
-              type: integer
-              format: int32
-              description: Total number of pages available for the given page size.
+          $ref: "#/components/schemas/Metadata"
     RosterRevisionSummary:
       type: object
       required:
