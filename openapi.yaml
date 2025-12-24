@@ -624,18 +624,15 @@ components:
           format: date
           description: The start date of the schedule.
         people_per_shift_override:
-          type: object
-          description: Mapping from day index (as string) to a map of shift ID to number of people required for each shift.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: integer
-              description: Number of people required for the shift.
+          type: array
+          description: List of per-date shift staffing requirements.
+          items:
+            $ref: "#/components/schemas/PeoplePerShiftOverrideEntry"
         people_per_shift_default:
-          type: object
-          description: Default number of people for each shift if not specified for a day.
-          additionalProperties:
-            type: integer
+          type: array
+          description: Default number of people for each shift if not specified for a date.
+          items:
+            $ref: "#/components/schemas/PeoplePerShiftDefaultEntry"
         shifts:
           type: array
           items:
@@ -645,55 +642,40 @@ components:
           type: boolean
           description: Whether to balance overtime hours across people.
         unavailable_slots:
-          type: object
-          description: Mapping of shift ID to person ID to list of days the person is unavailable.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: array
-              items:
-                type: integer
+          type: array
+          description: List of unavailability entries for people by shift and date.
+          items:
+            $ref: "#/components/schemas/UnavailableSlotEntry"
         leave_days:
-          type: object
-          description: Mapping of person ID to days the person is on leave.
-          additionalProperties:
-            type: array
-            items:
-              type: integer
+          type: array
+          description: List of leave entries by person.
+          items:
+            $ref: "#/components/schemas/LeaveDaysEntry"
         known_assignments:
-          type: object
-          description: Mapping of person ID to a map of shift ID to list of days the person is assigned to that shift.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: array
-              items:
-                type: integer
-              description: List of days the person is assigned to the shift.
+          type: array
+          description: List of known assignment entries.
+          items:
+            $ref: "#/components/schemas/KnownAssignmentEntry"
         shift_hours:
-          type: object
-          description: Mapping from shift ID to a dict of days of the week/default ('monday', 'tuesday') to a dict of regular/overtime hours.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              $ref: "#/components/schemas/Hours"
+          type: array
+          description: Per-shift hours configuration by day-of-week or default.
+          items:
+            $ref: "#/components/schemas/ShiftHoursEntry"
         regular_hours:
-          type: object
-          description: Default regular hours for each day of the week with a default.
-          additionalProperties:
-            type: integer
+          type: array
+          description: Default regular hours per day-of-week or default.
+          items:
+            $ref: "#/components/schemas/RegularHoursEntry"
         override_regular_hours:
-          type: object
-          description: Override regular hours for specific days.
-          additionalProperties:
-            type: integer
+          type: array
+          description: Per-date overrides for regular hours.
+          items:
+            $ref: "#/components/schemas/OverrideRegularHoursEntry"
         override_shift_hours:
-          type: object
-          description: Mapping from day of the month index to shift ID to a dict of regular/overtime hours.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              $ref: "#/components/schemas/Hours"
+          type: array
+          description: Per-date per-shift overrides for hours.
+          items:
+            $ref: "#/components/schemas/OverrideShiftHoursEntry"
         overtime_multiplier:
           type: number
           minimum: 0
@@ -717,10 +699,10 @@ components:
           type: boolean
           description: Whether to balance weekend shifts.
         post_call:
-          type: object
-          description: Mapping of shift IDs to whether they provide post-call (i.e. getting the next day off).
-          additionalProperties:
-            type: boolean
+          type: array
+          description: Post-call eligibility per shift.
+          items:
+            $ref: "#/components/schemas/PostCallEntry"
         minimum_overtime_hours:
           type: integer
           minimum: 0
@@ -735,43 +717,35 @@ components:
             $ref: "#/components/schemas/Group"
           description: All groups in the roster.
         group_members:
-          type: object
-          description: Mapping of group ID to list of person IDs in that group. Used to prevent group members from working the same day.
-          additionalProperties:
-            type: array
-            items:
-              type: string
+          type: array
+          description: Group membership entries; used to prevent group members from working the same day.
+          items:
+            $ref: "#/components/schemas/GroupMembersEntry"
         restrict_groups_overlap_per_weekday:
           type: array
           items:
             type: string
           description: List of days names for which to restrict group overlap.
         groups_unavailable_slots:
-          type: object
-          description: Mapping of group ID to a dict with keys of shift IDs, indicating unavailable slots for the group.
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: array
-              items:
-                type: integer
+          type: array
+          description: Unavailability entries for groups by shift and date.
+          items:
+            $ref: "#/components/schemas/GroupsUnavailableSlotsEntry"
         minimum_shifts_per_person:
-          type: object
-          description: Mapping of person ID to minimum number of shifts that person should work. If not specified, defaults to 0.
-          additionalProperties:
-            type: integer
+          type: array
+          description: Minimum shifts per person. If not specified for a person, defaults to 0.
+          items:
+            $ref: "#/components/schemas/MinimumShiftsPerPersonEntry"
         maximum_shifts_per_person:
-          type: object
-          description: Mapping of person ID to maximum number of shifts that person can work. If not specified, there is no maximum.
-          additionalProperties:
-            type: integer
+          type: array
+          description: Maximum shifts per person. If not specified for a person, there is no maximum.
+          items:
+            $ref: "#/components/schemas/MaximumShiftsPerPersonEntry"
         groups_allowed_days:
-          type: object
-          description: Mapping of group ID to list of days that group is allowed to work.
-          additionalProperties:
-            type: array
-            items:
-              type: integer
+          type: array
+          description: Allowed working dates per group.
+          items:
+            $ref: "#/components/schemas/GroupsAllowedDaysEntry"
         maximum_shifts:
           type: integer
           description: Maximum number of shifts that can be assigned to any person.
@@ -920,6 +894,202 @@ components:
           type: integer
         overtime:
           type: integer
+    PeoplePerShiftOverrideShiftRequirement:
+      type: object
+      required: [shift_id, required_people]
+      properties:
+        shift_id:
+          type: string
+          description: Shift ID.
+        required_people:
+          type: integer
+          description: Number of people required for the shift on the date.
+    PeoplePerShiftOverrideEntry:
+      type: object
+      required: [date, shifts]
+      properties:
+        date:
+          type: string
+          format: date
+          description: The date (YYYY-MM-DD) for which overrides apply.
+        shifts:
+          type: array
+          description: Per-shift required people for this date.
+          items:
+            $ref: "#/components/schemas/PeoplePerShiftOverrideShiftRequirement"
+    PeoplePerShiftDefaultEntry:
+      type: object
+      required: [shift_id, required_people]
+      properties:
+        shift_id:
+          type: string
+          description: Shift ID.
+        required_people:
+          type: integer
+          description: Default number of people required for the shift.
+    UnavailableSlotEntry:
+      type: object
+      required: [shift_id, person_id, dates]
+      properties:
+        shift_id:
+          type: string
+          description: Shift ID.
+        person_id:
+          type: string
+          description: Person ID.
+        dates:
+          type: array
+          items:
+            type: string
+            format: date
+    LeaveDaysEntry:
+      type: object
+      required: [person_id, dates]
+      properties:
+        person_id:
+          type: string
+          description: Person ID.
+        dates:
+          type: array
+          items:
+            type: string
+            format: date
+    KnownAssignmentEntry:
+      type: object
+      required: [person_id, shift_id, dates]
+      properties:
+        person_id:
+          type: string
+          description: Person ID.
+        shift_id:
+          type: string
+          description: Shift ID.
+        dates:
+          type: array
+          items:
+            type: string
+            format: date
+          description: Dates the person is assigned to the shift.
+    DayHoursEntry:
+      type: object
+      required: [day, hours]
+      properties:
+        day:
+          $ref: "#/components/schemas/DayOfWeekOrDefault"
+        hours:
+          $ref: "#/components/schemas/Hours"
+    ShiftHoursEntry:
+      type: object
+      required: [shift_id, by_day]
+      properties:
+        shift_id:
+          type: string
+          description: Shift ID.
+        by_day:
+          type: array
+          description: Hours per day-of-week or default.
+          items:
+            $ref: "#/components/schemas/DayHoursEntry"
+    RegularHoursEntry:
+      type: object
+      required: [day, hours]
+      properties:
+        day:
+          $ref: "#/components/schemas/DayOfWeekOrDefault"
+        hours:
+          type: integer
+    DayOfWeekOrDefault:
+      type: string
+      description: Day-of-week value or 'default'.
+      enum:
+        [
+          monday,
+          tuesday,
+          wednesday,
+          thursday,
+          friday,
+          saturday,
+          sunday,
+          default,
+        ]
+    OverrideRegularHoursEntry:
+      type: object
+      required: [date, hours]
+      properties:
+        date:
+          type: string
+          format: date
+        hours:
+          type: integer
+    OverrideShiftHoursEntry:
+      type: object
+      required: [date, shift_id, hours]
+      properties:
+        date:
+          type: string
+          format: date
+        shift_id:
+          type: string
+        hours:
+          $ref: "#/components/schemas/Hours"
+    PostCallEntry:
+      type: object
+      required: [shift_id, post_call]
+      properties:
+        shift_id:
+          type: string
+        post_call:
+          type: boolean
+    GroupMembersEntry:
+      type: object
+      required: [group_id, person_ids]
+      properties:
+        group_id:
+          type: string
+        person_ids:
+          type: array
+          items:
+            type: string
+    GroupsUnavailableSlotsEntry:
+      type: object
+      required: [group_id, shift_id, dates]
+      properties:
+        group_id:
+          type: string
+        shift_id:
+          type: string
+        dates:
+          type: array
+          items:
+            type: string
+            format: date
+    MinimumShiftsPerPersonEntry:
+      type: object
+      required: [person_id, min_shifts]
+      properties:
+        person_id:
+          type: string
+        min_shifts:
+          type: integer
+    MaximumShiftsPerPersonEntry:
+      type: object
+      required: [person_id, max_shifts]
+      properties:
+        person_id:
+          type: string
+        max_shifts:
+          type: integer
+    GroupsAllowedDaysEntry:
+      type: object
+      required: [group_id, dates]
+      properties:
+        group_id:
+          type: string
+        dates:
+          type: array
+          items:
+            type: string
+            format: date
     Person:
       type: object
       required:
