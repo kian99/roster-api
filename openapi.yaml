@@ -929,19 +929,16 @@ components:
           description: Default number of people required for the shift.
     UnavailableSlotEntry:
       type: object
-      required: [shift_id, person_id, dates]
+      required: [person_id, shift_dates]
       properties:
-        shift_id:
-          type: string
-          description: Shift ID.
         person_id:
           type: string
           description: Person ID.
-        dates:
+        shift_dates:
           type: array
           items:
-            type: string
-            format: date
+            $ref: "#/components/schemas/ShiftDates"
+          description: Array of shifts and their dates when the person is unavailable.
     LeaveDaysEntry:
       type: object
       required: [person_id, dates]
@@ -954,13 +951,10 @@ components:
           items:
             type: string
             format: date
-    KnownAssignmentEntry:
+    ShiftDates:
       type: object
-      required: [person_id, shift_id, dates]
+      required: [shift_id, dates]
       properties:
-        person_id:
-          type: string
-          description: Person ID.
         shift_id:
           type: string
           description: Shift ID.
@@ -969,7 +963,19 @@ components:
           items:
             type: string
             format: date
-          description: Dates the person is assigned to the shift.
+          description: Dates for this shift.
+    KnownAssignmentEntry:
+      type: object
+      required: [person_id, shift_dates]
+      properties:
+        person_id:
+          type: string
+          description: Person ID.
+        shift_dates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShiftDates"
+          description: Array of shifts and their dates for this person.
     DayHoursEntry:
       type: object
       required: [day, hours]
@@ -1052,17 +1058,16 @@ components:
             type: string
     GroupsUnavailableSlotsEntry:
       type: object
-      required: [group_id, shift_id, dates]
+      required: [group_id, shift_dates]
       properties:
         group_id:
           type: string
-        shift_id:
-          type: string
-        dates:
+          description: Group ID.
+        shift_dates:
           type: array
           items:
-            type: string
-            format: date
+            $ref: "#/components/schemas/ShiftDates"
+          description: Array of shifts and their dates when the group is unavailable.
     MinimumShiftsPerPersonEntry:
       type: object
       required: [person_id, min_shifts]
