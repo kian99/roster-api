@@ -54,13 +54,11 @@ paths:
           description: Number of results per page.
       responses:
         "200":
-          description: List of rosters
+          description: List of rosters with metadata
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RosterResponse"
+                $ref: "#/components/schemas/RosterListResponse"
         "401":
           description: Unauthorized
         "403":
@@ -812,6 +810,25 @@ components:
           type: string
           format: date-time
           description: Timestamp when the roster was created.
+    RosterListResponse:
+      type: object
+      required:
+        - metadata
+        - rosters
+      properties:
+        metadata:
+          type: object
+          required:
+            - total_count
+          properties:
+            total_count:
+              type: integer
+              format: int32
+              description: Total number of rosters matching the query.
+        rosters:
+          type: array
+          items:
+            $ref: "#/components/schemas/RosterResponse"
     RosterRevisionCreatedResponse:
       type: object
       required:
@@ -849,6 +866,7 @@ components:
         - roster_id
         - roster_name
         - revisions
+        - metadata
       properties:
         roster_id:
           type: integer
@@ -861,6 +879,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RosterRevisionSummary"
+        metadata:
+          type: object
+          required:
+            - total_count
+          properties:
+            total_count:
+              type: integer
+              format: int32
+              description: Total number of revisions available for this roster.
     RosterRevisionSummary:
       type: object
       required:
