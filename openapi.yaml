@@ -380,6 +380,15 @@ paths:
             type: integer
             format: int32
           description: Revision number of the roster revision.
+        - name: validationHash
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Optional hash from a prior validation request. If provided, the patch will
+            only be applied if the revision hasn't been modified since the validation
+            was performed.
       requestBody:
         required: true
         content:
@@ -389,6 +398,61 @@ paths:
       responses:
         "200":
           description: Roster revision updated successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict when applying patch (e.g., validation hash mismatch)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster or revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /api/v1/roster/{id}/revision/{revisionNumber}/validate:
+    post:
+      operationId: validateRosterRevisionChanges
+      summary: Validate roster revision changes
+      description: Validate the impact of applying the provided parameters to the specified roster revision.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RosterParameters"
+      responses:
+        "200":
+          description: Validation result containing proposed field changes and a validation hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidateRevisionResponse"
         "400":
           description: Invalid request
           content:
@@ -884,6 +948,52 @@ components:
         message:
           type: string
           description: Error message
+    FieldChangeChangeType:
+      type: string
+      description: The type of change that will be applied to the field.
+      enum:
+        - modified
+        - removed
+    FieldChange:
+      type: object
+      required:
+        - field
+        - change_type
+        - description
+      properties:
+        field:
+          type: string
+          description: The name of the field that will be changed (e.g., "unavailable_slots", "known_assignments").
+        change_type:
+          $ref: "#/components/schemas/FieldChangeChangeType"
+        description:
+          type: string
+          description: |
+            Human-readable description of what will change.
+            Examples:
+            - "Removed references to person 'dr. smith' from unavailable_slots"
+            - "Removed dates outside range 2025-06-01 to 2025-06-30 from known_assignments"
+            - "Removed references to shift 'night' from shift_hours"
+        details:
+          type: object
+          description: Optional structured details about the change for programmatic processing.
+          additionalProperties: true
+    ValidateRevisionResponse:
+      type: object
+      required:
+        - changes
+        - hash
+      properties:
+        changes:
+          type: array
+          description: List of fields that will be modified as a result of the requested changes.
+          items:
+            $ref: "#/components/schemas/FieldChange"
+        hash:
+          type: string
+          description: |
+            A hash of the validation state to prevent TOCTOU issues.
+            Send this hash with the subsequent PATCH request to ensure the revision hasn't been modified by another client.
     Hours:
       type: object
       required:
