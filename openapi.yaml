@@ -788,8 +788,8 @@ components:
         restrict_groups_overlap_per_weekday:
           type: array
           items:
-            type: string
-          description: List of days names for which to restrict group overlap.
+            $ref: "#/components/schemas/DayOfWeek"
+          description: List of days of the week for which to restrict group overlap.
         groups_unavailable_slots:
           type: array
           description: Unavailability entries for groups by shift and date.
@@ -1114,6 +1114,10 @@ components:
           $ref: "#/components/schemas/DayOfWeekOrDefault"
         hours:
           type: integer
+    DayOfWeek:
+      type: string
+      description: Day-of-week value.
+      enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
     DayOfWeekOrDefault:
       type: string
       description: Day-of-week value or 'default'.
