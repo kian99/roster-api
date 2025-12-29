@@ -967,12 +967,16 @@ components:
       type: object
       required:
         - changes
+        - parameters
       properties:
         changes:
           type: array
           description: List of fields that will be modified as a result of the requested changes.
           items:
             $ref: "#/components/schemas/FieldChange"
+        parameters:
+          $ref: "#/components/schemas/RosterParameters"
+          description: The updated parameters after applying the changes.
     Hours:
       type: object
       required:
