@@ -1253,14 +1253,27 @@ components:
           format: int32
           description: The revision number of the roster revision this solution is for.
         solution:
-          type: array
-          items:
-            type: array
-            items:
-              type: integer
-          description: The solution matrix.
+          $ref: "#/components/schemas/Solution"
         status:
           $ref: "#/components/schemas/SolutionStatus"
+    Solution:
+      type: object
+      properties:
+        assignments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Assignment"
+      required: [assignments]
+    Assignment:
+      type: object
+      required: [personId, dayIndex, shiftId]
+      properties:
+        personId:
+          type: string
+        dayIndex:
+          type: integer
+        shiftId:
+          type: string
     SolutionCreatedResponse:
       type: object
       required:
@@ -1293,12 +1306,7 @@ components:
           format: int32
           description: The revision number of the roster revision this solution is for.
         solution:
-          type: array
-          items:
-            type: array
-            items:
-              type: integer
-          description: The solution matrix.
+          $ref: "#/components/schemas/Solution"
         status:
           $ref: "#/components/schemas/SolutionStatus"
         createdAt:
