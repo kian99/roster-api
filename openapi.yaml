@@ -531,13 +531,12 @@ paths:
             type: integer
             format: int32
           description: Unique identifier for the solution.
-      requestBody: 
+      requestBody:
         required: true
-        content: 
+        content:
           application/json:
             schema:
               $ref: "#/components/schemas/Solution"
-      responses:
       responses:
         "200":
           description: Solution updated
@@ -556,7 +555,7 @@ paths:
         "401":
           description: Unauthorized
         "403":
-          description: Forbidden 
+          description: Forbidden
   /api/v1/roster/{id}/revision/{revisionNumber}/solve:
     post:
       operationId: solveRosterRevision
@@ -691,7 +690,6 @@ components:
       properties:
         parameters:
           $ref: "#/components/schemas/RosterParameters"
-          description: The parameters for the roster revision.
     RosterParameters:
       type: object
       # Note that no fields are required here as the client can send a work-in-progress
@@ -1014,7 +1012,6 @@ components:
             $ref: "#/components/schemas/FieldChange"
         parameters:
           $ref: "#/components/schemas/RosterParameters"
-          description: The updated parameters after applying the changes.
     Hours:
       type: object
       required:
