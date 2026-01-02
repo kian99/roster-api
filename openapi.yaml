@@ -577,8 +577,12 @@ paths:
             format: int32
           description: Revision number of the roster revision.
       responses:
-        "202":
-          description: Solve process started
+        "201":
+          description: Solve process started with pending solution created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolutionCreatedResponse"
         "400":
           description: Invalid request
           content:
@@ -1267,6 +1271,7 @@ components:
       type: string
       description: The status of the solution.
       enum:
+        - pending
         - manual
         - solved
         - infeasible
