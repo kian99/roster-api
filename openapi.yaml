@@ -464,7 +464,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SolutionSubmission"
+              $ref: "#/components/schemas/ManualSolutionSubmission"
       responses:
         "201":
           description: Solution created successfully
@@ -1302,15 +1302,6 @@ components:
         - infeasible
         - error
         - timed_out
-    SolutionSubmission:
-      discriminator:
-        propertyName: type
-        mapping:
-          manual: "#/components/schemas/ManualSolutionSubmission"
-          automatic: "#/components/schemas/AutomaticSolutionSubmission"
-      oneOf:
-        - $ref: "#/components/schemas/ManualSolutionSubmission"
-        - $ref: "#/components/schemas/AutomaticSolutionSubmission"
     SolutionUpdate:
       discriminator:
         propertyName: type
@@ -1340,32 +1331,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/SolutionType"
           enum: [manual]
-        solution:
-          $ref: "#/components/schemas/Solution"
-    AutomaticSolutionSubmission:
-      type: object
-      required:
-        - roster_id
-        - revision_number
-        - type
-        - solve_state
-      properties:
-        roster_id:
-          type: integer
-          format: int32
-          description: The ID of the roster this solution is for.
-        revision_number:
-          type: integer
-          format: int32
-          description: The revision number of the roster revision this solution is for.
-        type:
-          allOf:
-            - $ref: "#/components/schemas/SolutionType"
-          enum: [automatic]
-        solve_state:
-          $ref: "#/components/schemas/SolveState"
-        solve_outcome:
-          $ref: "#/components/schemas/SolveOutcome"
         solution:
           $ref: "#/components/schemas/Solution"
     ManualSolutionUpdate:
