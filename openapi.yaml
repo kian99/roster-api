@@ -522,7 +522,10 @@ paths:
     put:
       operationId: updateSolution
       summary: Update an existing solution
-      description: Update an existing solution with new data.
+      description: |
+        Update an existing solution with new data.
+        Manual solutions allow assignment edits.
+        Automatic solutions allow solve state/outcome updates from the solver and become immutable after the first completed outcome; further updates return 409.
       parameters:
         - name: id
           in: path
@@ -536,10 +539,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Solution"
+              $ref: "#/components/schemas/SolutionUpdate"
       responses:
         "200":
           description: Solution updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolutionResponse"
         "400":
           description: Invalid request
           content:
@@ -556,6 +563,12 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
+        "409":
+          description: Solution is immutable in its current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/v1/roster/{id}/revision/{revisionNumber}/solve:
     post:
       operationId: solveRosterRevision
@@ -1267,23 +1280,53 @@ components:
         name:
           type: string
           description: The name of the group.
-    SolutionStatus:
+    SolutionType:
       type: string
-      description: The status of the solution.
+      description: The type of solution, defining how it was solved.
+      enum:
+        - automatic
+        - manual
+    SolveState:
+      type: string
+      description: The lifecycle state of a solution.
       enum:
         - pending
-        - manual
-        - solved
+        - solving
+        - completed
+        - failed
+    SolveOutcome:
+      type: string
+      description: The outcome of an automatically solved solution once completed.
+      enum:
+        - feasible
         - infeasible
         - error
         - timed_out
     SolutionSubmission:
+      discriminator:
+        propertyName: type
+        mapping:
+          manual: "#/components/schemas/ManualSolutionSubmission"
+          automatic: "#/components/schemas/AutomaticSolutionSubmission"
+      oneOf:
+        - $ref: "#/components/schemas/ManualSolutionSubmission"
+        - $ref: "#/components/schemas/AutomaticSolutionSubmission"
+    SolutionUpdate:
+      discriminator:
+        propertyName: type
+        mapping:
+          manual: "#/components/schemas/ManualSolutionUpdate"
+          automatic: "#/components/schemas/AutomaticSolutionUpdate"
+      oneOf:
+        - $ref: "#/components/schemas/ManualSolutionUpdate"
+        - $ref: "#/components/schemas/AutomaticSolutionUpdate"
+    ManualSolutionSubmission:
       type: object
       required:
         - roster_id
         - revision_number
+        - type
         - solution
-        - status
       properties:
         roster_id:
           type: integer
@@ -1293,10 +1336,66 @@ components:
           type: integer
           format: int32
           description: The revision number of the roster revision this solution is for.
+        type:
+          allOf:
+            - $ref: "#/components/schemas/SolutionType"
+          enum: [manual]
         solution:
           $ref: "#/components/schemas/Solution"
-        status:
-          $ref: "#/components/schemas/SolutionStatus"
+    AutomaticSolutionSubmission:
+      type: object
+      required:
+        - roster_id
+        - revision_number
+        - type
+        - solve_state
+      properties:
+        roster_id:
+          type: integer
+          format: int32
+          description: The ID of the roster this solution is for.
+        revision_number:
+          type: integer
+          format: int32
+          description: The revision number of the roster revision this solution is for.
+        type:
+          allOf:
+            - $ref: "#/components/schemas/SolutionType"
+          enum: [automatic]
+        solve_state:
+          $ref: "#/components/schemas/SolveState"
+        solve_outcome:
+          $ref: "#/components/schemas/SolveOutcome"
+        solution:
+          $ref: "#/components/schemas/Solution"
+    ManualSolutionUpdate:
+      type: object
+      required:
+        - type
+        - solution
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/SolutionType"
+          enum: [manual]
+        solution:
+          $ref: "#/components/schemas/Solution"
+    AutomaticSolutionUpdate:
+      type: object
+      required:
+        - type
+        - solve_state
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/SolutionType"
+          enum: [automatic]
+        solve_state:
+          $ref: "#/components/schemas/SolveState"
+        solve_outcome:
+          $ref: "#/components/schemas/SolveOutcome"
+        solution:
+          $ref: "#/components/schemas/Solution"
     Solution:
       type: object
       properties:
@@ -1319,19 +1418,25 @@ components:
       type: object
       required:
         - id
+        - type
+        - solve_state
       properties:
         id:
           type: integer
           format: int32
           description: Unique identifier for the created solution.
+        type:
+          $ref: "#/components/schemas/SolutionType"
+        solve_state:
+          $ref: "#/components/schemas/SolveState"
     SolutionResponse:
       type: object
       required:
         - id
         - roster_id
         - revision_number
-        - solution
-        - status
+        - type
+        - solve_state
         - createdAt
       properties:
         id:
@@ -1346,10 +1451,14 @@ components:
           type: integer
           format: int32
           description: The revision number of the roster revision this solution is for.
+        type:
+          $ref: "#/components/schemas/SolutionType"
+        solve_state:
+          $ref: "#/components/schemas/SolveState"
+        solve_outcome:
+          $ref: "#/components/schemas/SolveOutcome"
         solution:
           $ref: "#/components/schemas/Solution"
-        status:
-          $ref: "#/components/schemas/SolutionStatus"
         createdAt:
           type: string
           format: date-time
@@ -1360,7 +1469,8 @@ components:
         - id
         - roster_id
         - revision_number
-        - status
+        - type
+        - solve_state
         - createdAt
       properties:
         id:
@@ -1375,8 +1485,12 @@ components:
           type: integer
           format: int32
           description: The revision number of the roster revision this solution is for.
-        status:
-          $ref: "#/components/schemas/SolutionStatus"
+        type:
+          $ref: "#/components/schemas/SolutionType"
+        solve_state:
+          $ref: "#/components/schemas/SolveState"
+        solve_outcome:
+          $ref: "#/components/schemas/SolveOutcome"
         createdAt:
           type: string
           format: date-time
