@@ -1445,7 +1445,7 @@ components:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the solution within the roster revision.
+          description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
           type: string
           format: uuid
@@ -1483,7 +1483,7 @@ components:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the solution within the roster revision.
+          description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
           type: string
           format: uuid
