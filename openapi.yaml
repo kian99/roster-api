@@ -7,7 +7,7 @@ info:
   version: 0.0.13
   description: API for creating and managing roster scheduling jobs.
 paths:
-  /api/v1/roster:
+  /api/v1/rosters:
     get:
       operationId: listRosters
       summary: List all rosters
@@ -90,7 +90,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}:
+  /api/v1/rosters/{id}:
     get:
       operationId: getRoster
       summary: Get roster details
@@ -100,8 +100,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
       responses:
         "200":
@@ -135,8 +135,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
       requestBody:
         required: true
@@ -163,7 +163,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/revision:
+  /api/v1/rosters/{id}/revisions:
     post:
       operationId: createRosterRevision
       summary: Create a new roster revision
@@ -173,8 +173,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
       requestBody:
         required: true
@@ -214,8 +214,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: sortBy
           in: query
@@ -273,7 +273,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/revision/{revisionNumber}:
+  /api/v1/rosters/{id}/{revisionNumber}:
     get:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRosterRevision
@@ -284,8 +284,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -326,8 +326,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -370,8 +370,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -405,7 +405,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/revision/{revisionNumber}/validate:
+  /api/v1/rosters/{id}/{revisionNumber}/validate:
     post:
       operationId: validateRosterRevisionChanges
       summary: Validate roster revision changes
@@ -415,8 +415,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -454,47 +454,33 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/solution:
-    post:
-      operationId: createSolution
-      summary: Create a solution for a roster
-      description: Create a solution for a given roster configuration.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ManualSolutionSubmission"
-      responses:
-        "201":
-          description: Solution created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SolutionCreatedResponse"
-        "400":
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-  /api/v1/solution/{id}:
+  /api/v1/rosters/{id}/{revisionNumber}/solutions/{solutionId}:
     get:
       operationId: getSolution
       summary: Get a solution by ID
-      description: Retrieve a solution for a given solution ID.
+      description: Retrieve a solution for a given roster revision and solution ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
             type: integer
             format: int32
-          description: Unique identifier for the solution.
+          description: Revision number of the roster revision.
+        - name: solutionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the solution within the roster revision.
       responses:
         "200":
           description: Solution found
@@ -531,9 +517,23 @@ paths:
           in: path
           required: true
           schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
             type: integer
             format: int32
-          description: Unique identifier for the solution.
+          description: Revision number of the roster revision.
+        - name: solutionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the solution within the roster revision.
       requestBody:
         required: true
         content:
@@ -569,7 +569,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/roster/{id}/revision/{revisionNumber}/solve:
+  /api/v1/rosters/{id}/{revisionNumber}/solve:
     post:
       operationId: solveRosterRevision
       summary: Trigger solving a roster revision
@@ -579,8 +579,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -612,7 +612,49 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/roster/{id}/revision/{revisionNumber}/solutions:
+  /api/v1/rosters/{id}/{revisionNumber}/solutions:
+    post:
+      operationId: createSolution
+      summary: Create a solution for a roster revision
+      description: Create a solution for a given roster revision.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+        - name: revisionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster revision.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualSolutionSubmission"
+      responses:
+        "201":
+          description: Solution created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolutionCreatedResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
     get:
       operationId: listSolutions
       summary: List solutions for a roster revision
@@ -622,8 +664,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
+            format: uuid
           description: Unique identifier for the roster.
         - name: revisionNumber
           in: path
@@ -861,8 +903,8 @@ components:
         - revision_number
       properties:
         id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: Unique identifier for the created roster.
         revision_number:
           type: integer
@@ -876,8 +918,8 @@ components:
         - createdAt
       properties:
         id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: Unique identifier for the roster.
         name:
           type: string
@@ -930,8 +972,8 @@ components:
         - createdAt
       properties:
         roster_id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: Unique identifier for the roster.
         revision_number:
           type: integer
@@ -952,8 +994,8 @@ components:
         - metadata
       properties:
         roster_id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: Unique identifier for the roster.
         roster_name:
           type: string
@@ -1314,19 +1356,9 @@ components:
     ManualSolutionSubmission:
       type: object
       required:
-        - roster_id
-        - revision_number
         - type
         - solution
       properties:
-        roster_id:
-          type: integer
-          format: int32
-          description: The ID of the roster this solution is for.
-        revision_number:
-          type: integer
-          format: int32
-          description: The revision number of the roster revision this solution is for.
         type:
           allOf:
             - $ref: "#/components/schemas/SolutionType"
@@ -1412,10 +1444,10 @@ components:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the solution.
+          description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: The ID of the roster this solution is for.
         revision_number:
           type: integer
@@ -1450,10 +1482,10 @@ components:
         id:
           type: integer
           format: int32
-          description: Unique identifier for the solution.
+          description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
           description: The ID of the roster this solution is for.
         revision_number:
           type: integer
