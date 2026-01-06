@@ -273,7 +273,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{rosterRevision}:
+  /api/v1/rosters/{id}/{roster_revision}:
     get:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRosterRevision
@@ -287,7 +287,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -329,7 +329,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -373,7 +373,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -405,7 +405,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{rosterRevision}/validate:
+  /api/v1/rosters/{id}/{roster_revision}/validate:
     post:
       operationId: validateRosterRevisionChanges
       summary: Validate roster revision changes
@@ -418,7 +418,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -454,7 +454,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{rosterRevision}/solutions/{solutionRevision}:
+  /api/v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}:
     get:
       operationId: getSolution
       summary: Get a solution by ID
@@ -467,14 +467,14 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
             type: integer
             format: int32
           description: Revision number of the roster.
-        - name: solutionRevision
+        - name: solution_revision
           in: path
           required: true
           schema:
@@ -520,14 +520,14 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
             type: integer
             format: int32
           description: Revision number of the roster.
-        - name: solutionRevision
+        - name: solution_revision
           in: path
           required: true
           schema:
@@ -569,7 +569,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/rosters/{id}/{rosterRevision}/solve:
+  /api/v1/rosters/{id}/{roster_revision}/solve:
     post:
       operationId: solveRosterRevision
       summary: Trigger solving a roster revision
@@ -582,7 +582,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -612,7 +612,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{rosterRevision}/solutions:
+  /api/v1/rosters/{id}/{roster_revision}/solutions:
     post:
       operationId: createSolution
       summary: Create a solution for a roster revision
@@ -625,7 +625,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
@@ -667,7 +667,7 @@ paths:
             type: string
             format: uuid
           description: Unique identifier for the roster.
-        - name: rosterRevision
+        - name: roster_revision
           in: path
           required: true
           schema:
