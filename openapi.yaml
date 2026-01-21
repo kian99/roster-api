@@ -7,7 +7,7 @@ info:
   version: 0.0.13
   description: API for creating and managing roster scheduling jobs.
 paths:
-  /api/v1/rosters:
+  /v1/rosters:
     get:
       operationId: listRosters
       summary: List all rosters
@@ -91,7 +91,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}:
+  /v1/rosters/{id}:
     get:
       operationId: getRoster
       summary: Get roster details
@@ -164,7 +164,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/revisions:
+  /v1/rosters/{id}/revisions:
     post:
       operationId: createRosterRevision
       summary: Create a new roster revision
@@ -274,7 +274,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{roster_revision}:
+  /v1/rosters/{id}/{roster_revision}:
     get:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRosterRevision
@@ -406,7 +406,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{roster_revision}/validate:
+  /v1/rosters/{id}/{roster_revision}/validate:
     post:
       operationId: validateRosterRevisionChanges
       summary: Validate roster revision changes
@@ -455,7 +455,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}:
+  /v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}:
     get:
       operationId: getSolution
       summary: Get a solution by ID
@@ -570,7 +570,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/rosters/{id}/{roster_revision}/solve:
+  /v1/rosters/{id}/{roster_revision}/solve:
     post:
       operationId: solveRosterRevision
       summary: Trigger solving a roster revision
@@ -613,7 +613,7 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
-  /api/v1/rosters/{id}/{roster_revision}/solutions:
+  /v1/rosters/{id}/{roster_revision}/solutions:
     post:
       operationId: createSolution
       summary: Create a solution for a roster revision
