@@ -164,6 +164,39 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
+    delete:
+      operationId: deleteRoster
+      summary: Delete a roster
+      description: |
+        Delete a roster by its ID.
+        Deletion is cascading and will remove any child resources (e.g. revisions, solutions, and related data).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+      responses:
+        "204":
+          description: Roster deleted successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
   /v1/rosters/{id}/revisions:
     post:
       operationId: createRosterRevision
@@ -406,6 +439,46 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
+    delete:
+      operationId: deleteRosterRevision
+      summary: Delete a roster revision
+      description: |
+        Delete a specific revision of a roster by roster ID and revision number.
+        Deletion is cascading and will remove any child resources associated with this revision (e.g. solutions and related data).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+        - name: roster_revision
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster.
+      responses:
+        "204":
+          description: Roster revision deleted successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Roster or revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
   /v1/rosters/{id}/{roster_revision}/validate:
     post:
       operationId: validateRosterRevisionChanges
@@ -570,6 +643,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteSolution
+      summary: Delete a solution
+      description: |
+        Delete a solution for the given roster revision.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the roster.
+        - name: roster_revision
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Revision number of the roster.
+        - name: solution_revision
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Unique identifier for the solution within the roster revision.
+      responses:
+        "204":
+          description: Solution deleted successfully
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Solution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
   /v1/rosters/{id}/{roster_revision}/solve:
     post:
       operationId: solveRosterRevision
