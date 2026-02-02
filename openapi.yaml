@@ -861,6 +861,8 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
+          maxLength: 100
           description: The name of the roster.
     RosterRevisionSubmission:
       type: object
@@ -876,13 +878,14 @@ components:
       properties:
         people:
           type: array
+          maxItems: 30
           items:
             $ref: "#/components/schemas/Person"
           description: All people in the roster.
         num_days:
           type: integer
           minimum: 1
-          maximum: 366
+          maximum: 99
           description: The number of days to schedule.
         start_date:
           type: string
@@ -891,15 +894,18 @@ components:
         people_per_shift_override:
           type: array
           description: List of per-date shift staffing requirements.
+          maxItems: 99
           items:
             $ref: "#/components/schemas/PeoplePerShiftOverrideEntry"
         people_per_shift_default:
           type: array
           description: Default number of people for each shift if not specified for a date.
+          maxItems: 10
           items:
             $ref: "#/components/schemas/PeoplePerShiftDefaultEntry"
         shifts:
           type: array
+          maxItems: 10
           items:
             $ref: "#/components/schemas/Shift"
           description: The shifts in a day.
@@ -909,36 +915,45 @@ components:
         unavailable_slots:
           type: array
           description: List of unavailability entries for people by shift and date.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/UnavailableSlotEntry"
         leave_days:
           type: array
           description: List of leave entries by person.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/LeaveDaysEntry"
         known_assignments:
           type: array
           description: List of known assignment entries.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/KnownAssignmentEntry"
         shift_hours:
           type: array
           description: Per-shift hours configuration by day-of-week or default.
+          maxItems: 10
           items:
             $ref: "#/components/schemas/ShiftHoursEntry"
         regular_hours:
           type: array
           description: Default regular hours per day-of-week or default.
+          # At most 7 weekdays + 1 'default'
+          maxItems: 8
           items:
             $ref: "#/components/schemas/RegularHoursEntry"
         override_regular_hours:
           type: array
           description: Per-date overrides for regular hours.
+          maxItems: 99
           items:
             $ref: "#/components/schemas/OverrideRegularHoursEntry"
         override_shift_hours:
           type: array
           description: Per-date per-shift overrides for hours.
+          # Up to (num_days * shifts) entries.
+          maxItems: 990 # 99 days * 10 shifts
           items:
             $ref: "#/components/schemas/OverrideShiftHoursEntry"
         overtime_multiplier:
@@ -970,6 +985,7 @@ components:
         post_call:
           type: array
           description: Post-call eligibility per shift.
+          maxItems: 10
           items:
             $ref: "#/components/schemas/PostCallEntry"
         minimum_overtime_hours:
@@ -984,37 +1000,44 @@ components:
           description: Minimum regular hours a person should work.
         groups:
           type: array
+          maxItems: 30
           items:
             $ref: "#/components/schemas/Group"
           description: All groups in the roster.
         group_members:
           type: array
           description: Group membership entries; used to prevent group members from working the same day.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/GroupMembersEntry"
         restrict_groups_overlap_per_weekday:
           type: array
+          maxItems: 7
           items:
             $ref: "#/components/schemas/DayOfWeek"
           description: List of days of the week for which to restrict group overlap.
         groups_unavailable_slots:
           type: array
           description: Unavailability entries for groups by shift and date.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/GroupsUnavailableSlotsEntry"
         minimum_shifts_per_person:
           type: array
           description: Minimum shifts per person. If not specified for a person, defaults to 0.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/MinimumShiftsPerPersonEntry"
         maximum_shifts_per_person:
           type: array
           description: Maximum shifts per person. If not specified for a person, there is no maximum.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/MaximumShiftsPerPersonEntry"
         groups_allowed_days:
           type: array
           description: Allowed working dates per group.
+          maxItems: 30
           items:
             $ref: "#/components/schemas/GroupsAllowedDaysEntry"
         maximum_shifts:
@@ -1131,6 +1154,8 @@ components:
           description: The name of the roster.
         revisions:
           type: array
+          # TODO: keep in sync with server-side pagination/page size defaults.
+          maxItems: 100
           items:
             $ref: "#/components/schemas/RosterRevisionSummary"
         metadata:
@@ -1148,6 +1173,8 @@ components:
         createdAt:
           type: string
           format: date-time
+          minLength: 1
+          maxLength: 40
           description: Timestamp when the roster revision was created.
     ErrorResponse:
       type: object
@@ -1156,10 +1183,12 @@ components:
       properties:
         summary:
           type: string
+          minLength: 1
           maxLength: 100
           description: Short error summary
         details:
           type: string
+          minLength: 1
           maxLength: 1000
           description: Error details
     FieldChangeChangeType:
@@ -1177,12 +1206,14 @@ components:
       properties:
         field:
           type: string
+          minLength: 1
           maxLength: 100
           description: The name of the field that will be changed (e.g., "unavailable_slots", "known_assignments").
         change_type:
           $ref: "#/components/schemas/FieldChangeChangeType"
         description:
           type: string
+          minLength: 1
           maxLength: 500
           description: |
             Human-readable description of what will change.
@@ -1203,6 +1234,7 @@ components:
         changes:
           type: array
           description: List of fields that will be modified as a result of the requested changes.
+          maxItems: 50
           items:
             $ref: "#/components/schemas/FieldChange"
         parameters:
@@ -1227,6 +1259,7 @@ components:
       properties:
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Shift ID.
         required_people:
@@ -1245,6 +1278,7 @@ components:
         shifts:
           type: array
           description: Per-shift required people for this date.
+          maxItems: 10
           items:
             $ref: "#/components/schemas/PeoplePerShiftOverrideShiftRequirement"
     PeoplePerShiftDefaultEntry:
@@ -1253,6 +1287,7 @@ components:
       properties:
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Shift ID.
         required_people:
@@ -1266,10 +1301,12 @@ components:
       properties:
         person_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Person ID.
         shift_dates:
           type: array
+          maxItems: 10
           items:
             $ref: "#/components/schemas/ShiftDates"
           description: Array of shifts and their dates when the person is unavailable.
@@ -1279,10 +1316,12 @@ components:
       properties:
         person_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Person ID.
         dates:
           type: array
+          maxItems: 99
           items:
             type: string
             format: date
@@ -1292,10 +1331,12 @@ components:
       properties:
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Shift ID.
         dates:
           type: array
+          maxItems: 99
           items:
             type: string
             format: date
@@ -1306,10 +1347,12 @@ components:
       properties:
         person_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Person ID.
         shift_dates:
           type: array
+          maxItems: 10
           items:
             $ref: "#/components/schemas/ShiftDates"
           description: Array of shifts and their dates for this person.
@@ -1327,11 +1370,14 @@ components:
       properties:
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Shift ID.
         by_day:
           type: array
           description: Hours per day-of-week or default.
+          # At most 7 weekdays + 1 'default'
+          maxItems: 8
           items:
             $ref: "#/components/schemas/DayHoursEntry"
     RegularHoursEntry:
@@ -1382,6 +1428,7 @@ components:
           format: date
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
         hours:
           $ref: "#/components/schemas/Hours"
@@ -1391,6 +1438,7 @@ components:
       properties:
         shift_id:
           type: string
+          minLength: 1
           maxLength: 50
         post_call:
           type: boolean
@@ -1400,11 +1448,14 @@ components:
       properties:
         group_id:
           type: string
+          minLength: 1
           maxLength: 50
         person_ids:
           type: array
+          maxItems: 30
           items:
             type: string
+            minLength: 1
             maxLength: 50
     GroupsUnavailableSlotsEntry:
       type: object
@@ -1412,10 +1463,12 @@ components:
       properties:
         group_id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Group ID.
         shift_dates:
           type: array
+          maxItems: 10
           items:
             $ref: "#/components/schemas/ShiftDates"
           description: Array of shifts and their dates when the group is unavailable.
@@ -1425,6 +1478,7 @@ components:
       properties:
         person_id:
           type: string
+          minLength: 1
           maxLength: 50
         min_shifts:
           type: integer
@@ -1436,6 +1490,7 @@ components:
       properties:
         person_id:
           type: string
+          minLength: 1
           maxLength: 50
         max_shifts:
           type: integer
@@ -1447,9 +1502,11 @@ components:
       properties:
         group_id:
           type: string
+          minLength: 1
           maxLength: 50
         dates:
           type: array
+          maxItems: 99
           items:
             type: string
             format: date
@@ -1461,10 +1518,12 @@ components:
       properties:
         id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Unique identifier for the person.
         name:
           type: string
+          minLength: 1
           maxLength: 50
           description: The name of the person.
     Shift:
@@ -1475,10 +1534,12 @@ components:
       properties:
         id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Unique identifier for the shift.
         name:
           type: string
+          minLength: 1
           maxLength: 50
           description: The name of the shift.
     Group:
@@ -1489,10 +1550,12 @@ components:
       properties:
         id:
           type: string
+          minLength: 1
           maxLength: 50
           description: Unique identifier for the group.
         name:
           type: string
+          minLength: 1
           maxLength: 50
           description: The name of the group.
     SolutionType:
@@ -1571,6 +1634,9 @@ components:
       properties:
         assignments:
           type: array
+          # Derived from (max num_days * max shifts * max people) = 99 * 10 * 30 = 29700.
+          # TODO: revisit if business rules allow >1 assignment per person per day/shift.
+          maxItems: 30000
           items:
             $ref: "#/components/schemas/Assignment"
       required: [assignments]
@@ -1580,6 +1646,7 @@ components:
       properties:
         personId:
           type: string
+          minLength: 1
           maxLength: 50
         dayIndex:
           type: integer
@@ -1587,6 +1654,7 @@ components:
           maximum: 365
         shiftId:
           type: string
+          minLength: 1
           maxLength: 50
     SolutionCreatedResponse:
       type: object
