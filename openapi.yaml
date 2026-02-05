@@ -4,7 +4,7 @@ info:
     name: UNKNOWN
     url: https://choosealicense.com/no-permission/
   title: Roster Scheduler Backend API
-  version: 0.0.13
+  version: 0.0.40
   description: API for creating and managing roster scheduling jobs.
 paths:
   /v1/rosters:
@@ -238,7 +238,12 @@ paths:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
       operationId: getRosterRevision
       summary: Get roster revision details
-      description: Retrieve a specific revision of a roster by roster ID and revision number.
+      description: |
+        Retrieve a specific revision of a roster by roster ID and revision number.
+
+        Note: This returns the current (latest) parameters for the revision, which may change over time.
+        If you need the exact parameters that were used for a specific solve attempt, use the
+        solution-scoped parameters endpoint instead.
       parameters:
         - $ref: "#/components/parameters/RosterIdParam"
         - $ref: "#/components/parameters/RevisionIdParam"
@@ -501,11 +506,54 @@ paths:
           description: Unauthorized
         "403":
           description: Forbidden
+
+  /v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}/parameters:
+    get:
+      tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
+      operationId: getSolutionParameters
+      summary: Get solution-associated roster parameters
+      description: |
+        Retrieve the roster parameters snapshot that is associated with the specified solution.
+
+        This is intended for solvers to ensure they use exactly the same parameters that were captured when
+        the solution was created (e.g. when solving was triggered), even if the roster revision is edited later.
+      parameters:
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
+        - $ref: "#/components/parameters/SolutionIdParam"
+      responses:
+        "200":
+          description: Parameters snapshot found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SolutionParametersResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Solution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
   /v1/rosters/{id}/{roster_revision}/solve:
     post:
       operationId: solveRosterRevision
       summary: Trigger solving a roster revision
-      description: Start the solve process for a specific roster revision by roster ID and revision number.
+      description: |
+        Start the solve process for a specific roster revision by roster ID and revision number.
+
+        When solving is triggered, the API creates a new automatic solution and stores a snapshot of the roster
+        parameters alongside that solution. The roster revision remains editable after this call; the solver should
+        fetch the solution-associated parameters snapshot when it needs a consistent view of the inputs.
       parameters:
         - $ref: "#/components/parameters/RosterIdParam"
         - $ref: "#/components/parameters/RevisionIdParam"
@@ -536,7 +584,11 @@ paths:
     post:
       operationId: createSolution
       summary: Create a solution for a roster revision
-      description: Create a solution for a given roster revision.
+      description: |
+        Create a solution for a given roster revision.
+
+        For automatic solutions, the API stores a snapshot of the roster parameters alongside the created
+        solution so that the solution can be interpreted consistently even if the roster revision is edited later.
       parameters:
         - $ref: "#/components/parameters/RosterIdParam"
         - $ref: "#/components/parameters/RevisionIdParam"
@@ -1494,6 +1546,30 @@ components:
         locked:
           type: boolean
           description: Indicates whether the solution is locked for editing.
+
+    SolutionParametersResponse:
+      type: object
+      required:
+        - id
+        - roster_id
+        - roster_revision
+        - parameters
+        - capturedAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Solution ID scoped to this roster revision.
+        roster_id:
+          $ref: "#/components/schemas/RosterId"
+        roster_revision:
+          $ref: "#/components/schemas/RevisionId"
+        parameters:
+          $ref: "#/components/schemas/RosterParameters"
+        capturedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the parameters snapshot was captured for this solution.
     SolutionListItemResponse:
       type: object
       required:
