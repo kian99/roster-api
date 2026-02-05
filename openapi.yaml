@@ -21,14 +21,7 @@ paths:
             enum: [created_date, name]
             default: created_date
           description: Field to sort by. Options are 'created_date' (roster creation timestamp) or 'name' (roster display name).
-        - name: sortOrder
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [asc, desc]
-            default: desc
-          description: Sort order. Use 'asc' for ascending or 'desc' for descending.
+        - $ref: "#/components/parameters/SortOrderParam"
         - name: name
           in: query
           required: false
@@ -36,23 +29,8 @@ paths:
             type: string
             maxLength: 100
           description: Filter rosters by name (case-insensitive partial match).
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: Page number for pagination (1-indexed).
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 30
-          description: Number of results per page.
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
       responses:
         "200":
           description: List of rosters with metadata
@@ -97,13 +75,7 @@ paths:
       summary: Get roster details
       description: Retrieve a roster by its ID.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
       responses:
         "200":
           description: Roster found
@@ -132,13 +104,7 @@ paths:
       summary: Update a roster
       description: Update the name of a roster by its ID.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
       requestBody:
         required: true
         content:
@@ -171,13 +137,7 @@ paths:
         Delete a roster by its ID.
         Deletion is cascading and will remove any child resources (e.g. revisions, solutions, and related data).
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
       responses:
         "204":
           description: Roster deleted successfully
@@ -203,13 +163,7 @@ paths:
       summary: Create a new roster revision
       description: Create a new revision for a roster with the provided parameters.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
       requestBody:
         required: true
         content:
@@ -244,13 +198,7 @@ paths:
       summary: List roster revisions
       description: Retrieve all revisions for a given roster ID.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
         - name: sortBy
           in: query
           required: false
@@ -259,31 +207,9 @@ paths:
             enum: [created_date]
             default: created_date
           description: Field to sort by. Currently only 'created_date' (revision creation timestamp) is supported.
-        - name: sortOrder
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [asc, desc]
-            default: desc
-          description: Sort order. Use 'asc' for ascending or 'desc' for descending.
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: Page number for pagination (1-indexed).
-        - name: size
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 30
-          description: Number of results per page.
+        - $ref: "#/components/parameters/SortOrderParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
       responses:
         "200":
           description: List of revisions for the roster
@@ -314,20 +240,8 @@ paths:
       summary: Get roster revision details
       description: Retrieve a specific revision of a roster by roster ID and revision number.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       responses:
         "200":
           description: Roster revision found
@@ -356,20 +270,8 @@ paths:
       summary: Update a roster revision
       description: Update the parameters of a roster revision by roster ID and revision number.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       requestBody:
         required: true
         content:
@@ -400,20 +302,8 @@ paths:
       summary: Partially update a roster revision
       description: Partially update a roster revision by roster ID and revision number. Only the fields provided in the request body will be updated.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       requestBody:
         required: true
         content:
@@ -446,20 +336,8 @@ paths:
         Delete a specific revision of a roster by roster ID and revision number.
         Deletion is cascading and will remove any child resources associated with this revision (e.g. solutions and related data).
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       responses:
         "204":
           description: Roster revision deleted successfully
@@ -485,20 +363,8 @@ paths:
       summary: Validate roster revision changes
       description: Validate the impact of applying the provided parameters to the specified roster revision.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       requestBody:
         required: true
         content:
@@ -534,27 +400,9 @@ paths:
       summary: Get a solution by ID
       description: Retrieve a solution for a given roster revision and solution ID.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
-        - name: solution_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the solution within the roster revision.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
+        - $ref: "#/components/parameters/SolutionIdParam"
       responses:
         "200":
           description: Solution found
@@ -587,27 +435,9 @@ paths:
         Manual solutions allow assignment edits.
         Automatic solutions allow solve state/outcome updates from the solver and become immutable after the first completed outcome; further updates return 409.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
-        - name: solution_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the solution within the roster revision.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
+        - $ref: "#/components/parameters/SolutionIdParam"
       requestBody:
         required: true
         content:
@@ -649,27 +479,9 @@ paths:
       description: |
         Delete a solution for the given roster revision.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
-        - name: solution_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Unique identifier for the solution within the roster revision.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
+        - $ref: "#/components/parameters/SolutionIdParam"
       responses:
         "204":
           description: Solution deleted successfully
@@ -695,20 +507,8 @@ paths:
       summary: Trigger solving a roster revision
       description: Start the solve process for a specific roster revision by roster ID and revision number.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       responses:
         "201":
           description: Solve process started with pending solution created
@@ -738,20 +538,8 @@ paths:
       summary: Create a solution for a roster revision
       description: Create a solution for a given roster revision.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       requestBody:
         required: true
         content:
@@ -780,20 +568,8 @@ paths:
       summary: List solutions for a roster revision
       description: Retrieve all solutions associated with a given roster revision.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Unique identifier for the roster.
-        - name: roster_revision
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-          description: Revision number of the roster.
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
       responses:
         "200":
           description: List of solutions for the specified roster revision
@@ -853,7 +629,83 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    RosterIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/RosterId"
+      description: Unique identifier for the roster.
+    RevisionIdParam:
+      name: roster_revision
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/RevisionId"
+      description: Revision number of the roster.
+    SolutionIdParam:
+      name: solution_revision
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+      description: Unique identifier for the solution within the roster revision.
+    PageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number for pagination (1-indexed).
+    SizeParam:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 30
+      description: Number of results per page.
+    SortOrderParam:
+      name: sortOrder
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: Sort order. Use 'asc' for ascending or 'desc' for descending.
   schemas:
+    # --- Common Types ---
+    RosterId:
+      type: string
+      format: uuid
+      description: Unique identifier for the roster.
+    RevisionId:
+      type: integer
+      format: int32
+      description: Revision number.
+    PersonId:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Unique identifier for a person.
+    ShiftId:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Unique identifier for a shift.
+    GroupId:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Unique identifier for a group.
+
     RosterSubmission:
       type: object
       required:
@@ -1055,13 +907,9 @@ components:
         - roster_revision
       properties:
         id:
-          type: string
-          format: uuid
-          description: Unique identifier for the created roster.
+          $ref: "#/components/schemas/RosterId"
         roster_revision:
-          type: integer
-          format: int32
-          description: Revision number of the initial revision.
+          $ref: "#/components/schemas/RevisionId"
     RosterResponse:
       type: object
       required:
@@ -1070,9 +918,7 @@ components:
         - createdAt
       properties:
         id:
-          type: string
-          format: uuid
-          description: Unique identifier for the roster.
+          $ref: "#/components/schemas/RosterId"
         name:
           type: string
           description: The name of the roster.
@@ -1112,9 +958,7 @@ components:
         - roster_revision
       properties:
         roster_revision:
-          type: integer
-          format: int32
-          description: Revision number for the created roster revision.
+          $ref: "#/components/schemas/RevisionId"
     RosterRevisionResponse:
       type: object
       required:
@@ -1124,13 +968,9 @@ components:
         - createdAt
       properties:
         roster_id:
-          type: string
-          format: uuid
-          description: Unique identifier for the roster.
+          $ref: "#/components/schemas/RosterId"
         roster_revision:
-          type: integer
-          format: int32
-          description: Revision number of this revision.
+          $ref: "#/components/schemas/RevisionId"
         parameters:
           $ref: "#/components/schemas/RosterParameters"
         createdAt:
@@ -1146,9 +986,7 @@ components:
         - metadata
       properties:
         roster_id:
-          type: string
-          format: uuid
-          description: Unique identifier for the roster.
+          $ref: "#/components/schemas/RosterId"
         roster_name:
           type: string
           description: The name of the roster.
@@ -1167,9 +1005,7 @@ components:
         - createdAt
       properties:
         roster_revision:
-          type: integer
-          format: int32
-          description: Revision number of this revision.
+          $ref: "#/components/schemas/RevisionId"
         createdAt:
           type: string
           format: date-time
@@ -1258,10 +1094,7 @@ components:
       required: [shift_id, required_people]
       properties:
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Shift ID.
+          $ref: "#/components/schemas/ShiftId"
         required_people:
           type: integer
           minimum: 0
@@ -1286,10 +1119,7 @@ components:
       required: [shift_id, required_people]
       properties:
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Shift ID.
+          $ref: "#/components/schemas/ShiftId"
         required_people:
           type: integer
           minimum: 0
@@ -1300,10 +1130,7 @@ components:
       required: [person_id, shift_dates]
       properties:
         person_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Person ID.
+          $ref: "#/components/schemas/PersonId"
         shift_dates:
           type: array
           maxItems: 10
@@ -1315,10 +1142,7 @@ components:
       required: [person_id, dates]
       properties:
         person_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Person ID.
+          $ref: "#/components/schemas/PersonId"
         dates:
           type: array
           maxItems: 99
@@ -1330,10 +1154,7 @@ components:
       required: [shift_id, dates]
       properties:
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Shift ID.
+          $ref: "#/components/schemas/ShiftId"
         dates:
           type: array
           maxItems: 99
@@ -1346,10 +1167,7 @@ components:
       required: [person_id, shift_dates]
       properties:
         person_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Person ID.
+          $ref: "#/components/schemas/PersonId"
         shift_dates:
           type: array
           maxItems: 10
@@ -1369,10 +1187,7 @@ components:
       required: [shift_id, by_day]
       properties:
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Shift ID.
+          $ref: "#/components/schemas/ShiftId"
         by_day:
           type: array
           description: Hours per day-of-week or default.
@@ -1427,9 +1242,7 @@ components:
           type: string
           format: date
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/ShiftId"
         hours:
           $ref: "#/components/schemas/Hours"
     PostCallEntry:
@@ -1437,9 +1250,7 @@ components:
       required: [shift_id, post_call]
       properties:
         shift_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/ShiftId"
         post_call:
           type: boolean
     GroupMembersEntry:
@@ -1447,25 +1258,18 @@ components:
       required: [group_id, person_ids]
       properties:
         group_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/GroupId"
         person_ids:
           type: array
           maxItems: 30
           items:
-            type: string
-            minLength: 1
-            maxLength: 50
+            $ref: "#/components/schemas/PersonId"
     GroupsUnavailableSlotsEntry:
       type: object
       required: [group_id, shift_dates]
       properties:
         group_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Group ID.
+          $ref: "#/components/schemas/GroupId"
         shift_dates:
           type: array
           maxItems: 10
@@ -1477,9 +1281,7 @@ components:
       required: [person_id, min_shifts]
       properties:
         person_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/PersonId"
         min_shifts:
           type: integer
           minimum: 0
@@ -1489,9 +1291,7 @@ components:
       required: [person_id, max_shifts]
       properties:
         person_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/PersonId"
         max_shifts:
           type: integer
           minimum: 0
@@ -1501,9 +1301,7 @@ components:
       required: [group_id, dates]
       properties:
         group_id:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/GroupId"
         dates:
           type: array
           maxItems: 99
@@ -1517,10 +1315,7 @@ components:
         - name
       properties:
         id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Unique identifier for the person.
+          $ref: "#/components/schemas/PersonId"
         name:
           type: string
           minLength: 1
@@ -1533,10 +1328,7 @@ components:
         - name
       properties:
         id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Unique identifier for the shift.
+          $ref: "#/components/schemas/ShiftId"
         name:
           type: string
           minLength: 1
@@ -1549,10 +1341,7 @@ components:
         - name
       properties:
         id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: Unique identifier for the group.
+          $ref: "#/components/schemas/GroupId"
         name:
           type: string
           minLength: 1
@@ -1645,17 +1434,13 @@ components:
       required: [personId, dayIndex, shiftId]
       properties:
         personId:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/PersonId"
         dayIndex:
           type: integer
           minimum: 0
           maximum: 365
         shiftId:
-          type: string
-          minLength: 1
-          maxLength: 50
+          $ref: "#/components/schemas/ShiftId"
     SolutionCreatedResponse:
       type: object
       required:
@@ -1691,13 +1476,9 @@ components:
           format: int32
           description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
-          type: string
-          format: uuid
-          description: The ID of the roster this solution is for.
+          $ref: "#/components/schemas/RosterId"
         roster_revision:
-          type: integer
-          format: int32
-          description: The revision number of the roster this solution is for.
+          $ref: "#/components/schemas/RevisionId"
         type:
           $ref: "#/components/schemas/SolutionType"
         solve_state:
@@ -1729,13 +1510,9 @@ components:
           format: int32
           description: Solution ID scoped to this roster revision. Each revision has its own sequence of solution IDs starting from 1.
         roster_id:
-          type: string
-          format: uuid
-          description: The ID of the roster this solution is for.
+          $ref: "#/components/schemas/RosterId"
         roster_revision:
-          type: integer
-          format: int32
-          description: The revision number of the roster this solution is for.
+          $ref: "#/components/schemas/RevisionId"
         type:
           $ref: "#/components/schemas/SolutionType"
         solve_state:
