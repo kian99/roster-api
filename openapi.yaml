@@ -815,7 +815,9 @@ components:
           description: The shifts in a day.
         balance_overtime:
           type: boolean
-          description: Whether to balance overtime hours across people.
+          description: |
+            Whether to balance overtime hours across people. Requires shift_hours to be specified.
+            Cannot be used with balance_total_shifts.
         unavailable_slots:
           type: array
           description: List of unavailability entries for people by shift and date.
@@ -880,9 +882,9 @@ components:
           minimum: 0
           maximum: 52
           description: Maximum number of golden weekends (weekends with no shifts) a person can have. If 0, no maximum is enforced.
-        balance_day_night:
+        balance_total_shifts:
           type: boolean
-          description: Whether to balance day and night shifts.
+          description: Whether to balance total shifts (shift count) across people. Cannot be used with balance_overtime.
         balance_weekend_shifts:
           type: boolean
           description: Whether to balance weekend shifts.
