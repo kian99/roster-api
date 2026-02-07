@@ -1421,6 +1421,14 @@ components:
         - infeasible
         - error
         - timed_out
+    SolveError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error that prevented solving.
     SolutionUpdate:
       discriminator:
         propertyName: type
@@ -1468,6 +1476,8 @@ components:
           $ref: "#/components/schemas/SolveState"
         solve_outcome:
           $ref: "#/components/schemas/SolveOutcome"
+        solve_error:
+          $ref: "#/components/schemas/SolveError"
         solution:
           $ref: "#/components/schemas/Solution"
     Solution:
@@ -1537,6 +1547,8 @@ components:
           $ref: "#/components/schemas/SolveState"
         solve_outcome:
           $ref: "#/components/schemas/SolveOutcome"
+        solve_error:
+          $ref: "#/components/schemas/SolveError"
         solution:
           $ref: "#/components/schemas/Solution"
         createdAt:
