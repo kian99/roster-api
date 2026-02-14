@@ -622,6 +622,9 @@ paths:
       description: |
         Create a solution for a given roster revision.
 
+        You can either provide a full manual solution payload, or clone from an existing
+        solution in the same roster revision by setting source_solution_revision.
+
         For automatic solutions, the API stores a snapshot of the roster parameters alongside the created
         solution so that the solution can be interpreted consistently even if the roster revision is edited later.
       parameters:
@@ -1477,14 +1480,14 @@ components:
         - $ref: "#/components/schemas/AutomaticSolutionUpdate"
     ManualSolutionSubmission:
       type: object
-      required:
-        - type
-        - solution
       properties:
-        type:
-          allOf:
-            - $ref: "#/components/schemas/SolutionType"
-          enum: [manual]
+        source_solution_revision:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            Optional source solution revision to clone from within the same roster revision.
+            When provided, the new solution is initialized from the referenced solution.
         solution:
           $ref: "#/components/schemas/Solution"
     ManualSolutionUpdate:
