@@ -1662,14 +1662,16 @@ components:
     ShiftStatsPerPerson:
       type: object
       required:
-        - shift_id
-        - person_id
+        - shift_name
+        - person_name
         - assigned_count
       properties:
-        shift_id:
-          $ref: "#/components/schemas/ShiftId"
-        person_id:
-          $ref: "#/components/schemas/PersonId"
+        shift_name:
+          type: string
+          description: The name of the shift.
+        person_name:
+          type: string
+          description: The name of the person.
         assigned_count:
           type: integer
           minimum: 0
@@ -1678,11 +1680,12 @@ components:
     WeekendShiftsPerPerson:
       type: object
       required:
-        - person_id
+        - person_name
         - assigned_count
       properties:
-        person_id:
-          $ref: "#/components/schemas/PersonId"
+        person_name:
+          type: string
+          description: The name of the person.
         assigned_count:
           type: integer
           minimum: 0
@@ -1691,12 +1694,13 @@ components:
     HoursPerPerson:
       type: object
       required:
-        - person_id
+        - person_name
         - regular_hours
         - overtime_hours
       properties:
-        person_id:
-          $ref: "#/components/schemas/PersonId"
+        person_name:
+          type: string
+          description: The name of the person.
         regular_hours:
           type: integer
           minimum: 0
