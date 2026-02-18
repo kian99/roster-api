@@ -1572,7 +1572,6 @@ components:
         - solve_state
         - createdAt
         - locked
-        - has_parameters_snapshot
       properties:
         id:
           type: integer
@@ -1599,9 +1598,6 @@ components:
         locked:
           type: boolean
           description: Indicates whether the solution is locked for editing.
-        has_parameters_snapshot:
-          type: boolean
-          description: Indicates whether a snapshot of the roster parameters is stored for this solution (true for all automatic solutions).
 
     SolutionParametersResponse:
       type: object
