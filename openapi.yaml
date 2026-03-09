@@ -686,6 +686,15 @@ paths:
         "403":
           description: Forbidden
   /healthz:
+    head:
+      operationId: healthCheckHead
+      summary: Health check (HEAD)
+      description: Return health check HTTP code.
+      responses: 
+        "200":
+          description: Service is healthy
+        "503":
+          description: Service is unhealthy
     get:
       operationId: healthCheck
       summary: Health check
