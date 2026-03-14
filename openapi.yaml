@@ -542,6 +542,56 @@ paths:
         "403":
           description: Forbidden
 
+  /v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}/download:
+    get:
+      operationId: downloadSolution
+      summary: Download a solution file
+      description: |
+        Download the specified solution as a file.
+        Use the format query parameter to choose between PDF, spreadsheet, or CSV.
+      parameters:
+        - $ref: "#/components/parameters/RosterIdParam"
+        - $ref: "#/components/parameters/RevisionIdParam"
+        - $ref: "#/components/parameters/SolutionIdParam"
+        - $ref: "#/components/parameters/SolutionDownloadFormatParam"
+      responses:
+        "200":
+          description: Solution file generated successfully
+          headers:
+            Content-Disposition:
+              description: Suggested download filename.
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Solution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
   /v1/rosters/{id}/{roster_revision}/solutions/{solution_revision}/parameters:
     get:
       tags: [Solver] # Indicates this endpoint is part of a group of endpoints used by the solver.
@@ -779,6 +829,16 @@ components:
         enum: [asc, desc]
         default: desc
       description: Sort order. Use 'asc' for ascending or 'desc' for descending.
+    SolutionDownloadFormatParam:
+      name: format
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [pdf, spreadsheet, csv]
+      description: |
+        File format for the downloaded solution.
+        Use 'spreadsheet' to request an XLSX file.
   schemas:
     # --- Common Types ---
     RosterId:
